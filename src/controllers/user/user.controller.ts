@@ -1,13 +1,16 @@
 import { Request, Response } from 'express';
 import { prisma } from '../../server';
+import bcrypt from 'bcrypt';
 
 const createUser = async (req: Request, res: Response) => {
+    const SALT_ROUND = 10;
     try {
         const { email, phoneNumber, age, gender, password } = req.body;
+        const hashPw = await bcrypt.hash(password, SALT_ROUND);
         const isDuplicateEmail = await prisma.user.findUnique({ where: { email } });
         if (isDuplicateEmail) {
             {
-                return res.status(400).json({ resultMsg: '이미 존재하는 이메일입니다.', resultCode: 2002 });
+                return res.status(409).json({ resultMsg: '이미 존재하는 이메일입니다.', resultCode: 2002 });
             }
         }
         const createUser = await prisma.user.create({
@@ -16,10 +19,10 @@ const createUser = async (req: Request, res: Response) => {
                 phoneNumber,
                 age,
                 gender,
-                password,
+                password: hashPw,
             },
         });
-        res.status(200).json(createUser);
+        res.status(201).json(createUser);
     } catch (e) {
         res.status(500).json({ error: e });
     }
