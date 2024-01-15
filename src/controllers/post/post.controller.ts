@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { prisma } from '../server';
+import { prisma } from '../../server';
 
 const createBlogPost = async (req: Request, res: Response) => {
     try {
