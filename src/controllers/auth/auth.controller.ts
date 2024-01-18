@@ -11,7 +11,7 @@ const createUser = async (req: Request, res: Response) => {
         const isDuplicateEmail = await prisma.user.findUnique({ where: { email } });
         if (isDuplicateEmail) {
             {
-                return res.status(409).json({ error: { resultMsg: '이미 존재하는 이메일입니다.', resultCode: 2002 } });
+                return res.status(409).json({ error: { resultCd: 409, resultMsg: '이미 존재하는 이메일입니다.' } });
             }
         }
         const createUser = await prisma.user.create({
@@ -23,10 +23,9 @@ const createUser = async (req: Request, res: Response) => {
                 password: hashPw,
             },
         });
-        res.status(201).json(createUser);
+        return res.status(201).json({ resultCd: 200, data: createUser });
     } catch (e) {
         if (e instanceof Prisma.PrismaClientKnownRequestError) {
-            // The .code property can be accessed in a type-safe manner
             if (e.code === 'P2002') {
                 console.log('There is a unique constraint violation, a new user cannot be created with this email');
             }
@@ -40,18 +39,18 @@ const login = async (req: Request, res: Response) => {
         const { email, password } = req.body;
         const user = await prisma.user.findUnique({ where: { email } });
         if (!user) {
-            return res.status(401).json({ error: { resultMsg: '존재하지 않는 계정입니다', resultCd: '2004' } });
+            return res.status(401).json({ error: { resultCd: 401, resultMsg: '존재하지 않는 계정입니다' } });
         }
         const passwordMatch = await bcrypt.compare(password, user.password);
         if (!passwordMatch) {
             return res.status(401).json({
                 error: {
+                    resultCd: 401,
                     resultMsg: '비밀번호가 틀렸습니다.',
-                    resultCd: '2003',
                 },
             });
         }
-        return res.status(200).json({ user, resultCd: '2000' });
+        return res.status(200).json({ resultCd: 200, data: user });
     } catch (e) {
         console.error('error', e);
     }
