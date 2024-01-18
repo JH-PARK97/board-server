@@ -1,7 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import express, { Request, Response } from 'express';
-import PostRouter from './routes/post.route';
-// import cors from 'cors';
+import PostRouter from './routes/route';
 var cors = require('cors');
 
 export const prisma = new PrismaClient();
