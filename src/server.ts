@@ -1,18 +1,21 @@
 import { PrismaClient } from '@prisma/client';
 import express, { Request, Response } from 'express';
-import PostRouter from './routes/route';
+import Router from './routes/route';
+import cookieParser from 'cookie-parser';
 var cors = require('cors');
 
 export const prisma = new PrismaClient();
 
 const app = express();
 const port = 8080;
+const jwtSecretKey = process.env.TOKEN_SECRET_KEY as string;
 
 async function main() {
     app.use(express.json());
     app.use(cors());
+    app.use(cookieParser(jwtSecretKey));
 
-    app.use('/api/v1/post', PostRouter);
+    app.use('/api/v1', Router);
 
     app.all('*', (req: Request, res: Response) => {
         res.status(404).json({ error: `Route ${req.originalUrl} not found` });

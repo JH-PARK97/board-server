@@ -1,11 +1,12 @@
 import express from 'express';
 import postController from '../controllers/post/post.controller';
 import authController from '../controllers/auth/auth.controller';
+import { authMiddleware } from '../middleware/authMiddleware';
 
 const router = express.Router();
 
 // 게시글
-router.post('/post', postController.createBlogPost);
+router.post('/post', authMiddleware, postController.createBlogPost);
 
 // auth (로그인, 로그아웃, 회원가입)
 router.post('/user', authController.createUser);

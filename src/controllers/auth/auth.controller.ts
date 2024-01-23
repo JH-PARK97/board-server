@@ -2,7 +2,9 @@ import { Request, Response } from 'express';
 import { prisma } from '../../server';
 import bcrypt from 'bcrypt';
 import { Prisma } from '@prisma/client';
+import jwt from 'jsonwebtoken';
 
+import { authMiddleware } from '../../middleware/authMiddleware';
 const createUser = async (req: Request, res: Response) => {
     const SALT_ROUND = 10;
     try {
@@ -35,11 +37,13 @@ const createUser = async (req: Request, res: Response) => {
 };
 
 const login = async (req: Request, res: Response) => {
+    const jwtSecretKey = process.env.TOKEN_SECRET_KEY as string;
     try {
         const { email, password } = req.body;
         const user = await prisma.user.findUnique({ where: { email } });
+
         if (!user) {
-            return res.status(401).json({ error: { resultCd: 401, resultMsg: '존재하지 않는 계정입니다' } });
+            return res.status(401).json({ error: { resultCd: 401, resultMsg: '존재하지 않는 계정입니다.' } });
         }
         const passwordMatch = await bcrypt.compare(password, user.password);
         if (!passwordMatch) {
@@ -50,23 +54,18 @@ const login = async (req: Request, res: Response) => {
                 },
             });
         }
-        return res.status(200).json({ resultCd: 200, data: user });
-    } catch (e) {
-        console.error('error', e);
+
+        const token = jwt.sign({ email: user.email, age: user.age, gender: user.gender }, jwtSecretKey, {
+            expiresIn: '1h',
+        });
+
+        res.status(200).json({ user, token });
+    } catch (error) {
+        res.status(500).json({ error: 'Login failed' });
     }
 };
 
-// const getUser = async (req: Request, res: Response) => {
-//     try {
-//         const { email } = req.body;
-//         const getUser = await prisma.user.findMany({
-//             email,
-//         });
-//         res.status(200).json(getUser);
-//     } catch (e) {
-//         res.status(500).json({ error: e });
-//     }
-// };
+
 
 export default {
     createUser,
