@@ -58,14 +58,12 @@ const login = async (req: Request, res: Response) => {
         const token = jwt.sign({ email: user.email, age: user.age, gender: user.gender }, jwtSecretKey, {
             expiresIn: '1h',
         });
-
-        res.status(200).json({ user, token });
+        res.cookie('token', token, { httpOnly: true });
+        res.status(200).json({ resultCd: 200, data: user, token });
     } catch (error) {
         res.status(500).json({ error: 'Login failed' });
     }
 };
-
-
 
 export default {
     createUser,
