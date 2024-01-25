@@ -1,10 +1,9 @@
 import { Request, Response } from 'express';
 import { prisma } from '../../server';
 import bcrypt from 'bcrypt';
-import { Prisma } from '@prisma/client';
+import { Prisma, type User } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 
-import { authMiddleware } from '../../middleware/authMiddleware';
 const createUser = async (req: Request, res: Response) => {
     const SALT_ROUND = 10;
     try {
@@ -36,6 +35,10 @@ const createUser = async (req: Request, res: Response) => {
     }
 };
 
+function exclude<Key extends keyof User>(user: User, keys: Key[]): Omit<User, Key> {
+    return Object.fromEntries(Object.entries(user).filter(([key]) => !keys.includes(key as unknown as Key))) as Omit<User, Key>
+}
+
 const login = async (req: Request, res: Response) => {
     const jwtSecretKey = process.env.TOKEN_SECRET_KEY as string;
     try {
@@ -58,8 +61,8 @@ const login = async (req: Request, res: Response) => {
         const token = jwt.sign({ email: user.email, age: user.age, gender: user.gender }, jwtSecretKey, {
             expiresIn: '1h',
         });
-        res.cookie('token', token, { httpOnly: true });
-        res.status(200).json({ resultCd: 200, data: user, token });
+        // res.cookie('token', token, { httpOnly: true,  });
+        res.status(200).json({ resultCd: 200, data: exclude(user, ['password']), token });
     } catch (error) {
         res.status(500).json({ error: 'Login failed' });
     }
