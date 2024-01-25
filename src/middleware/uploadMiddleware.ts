@@ -1,22 +1,31 @@
 import util from 'util';
 import multer from 'multer';
+import fs from 'fs';
+import path from 'path';
+
 const MAX_SIZE = 2 * 1024 * 1024;
 
-let storage = multer.diskStorage({
+const storage = multer.diskStorage({
     destination(req, file, callback) {
-        callback(null, __dirname + '/resources/static/assets/uploads');
+        const uploadPath = 'uploads/';
+
+        if (!fs.existsSync(uploadPath)) {
+            fs.mkdirSync(uploadPath);
+        }
+        callback(null, uploadPath);
     },
+
     filename(req, file, callback) {
         console.log(file.originalname);
-        callback(null, file.originalname);
+        callback(null, `${file.originalname}-${Date.now() + path.extname(file.originalname)}`);
     },
 });
 
-let uploadFile = multer({
+const uploadFile = multer({
     storage: storage,
     limits: { fileSize: MAX_SIZE },
 }).single('file');
 
-let uploadFileMiddleware = util.promisify(uploadFile);
+const uploadFileMiddleware = util.promisify(uploadFile);
 
-module.exports = uploadFileMiddleware;
+export default uploadFileMiddleware;

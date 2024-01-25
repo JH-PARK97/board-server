@@ -12,6 +12,7 @@ const port = 8080;
 async function main() {
     app.use(express.json());
     app.use(cors());
+    app.use(express.static('public'));
 
     app.use('/api/v1', Router);
 
