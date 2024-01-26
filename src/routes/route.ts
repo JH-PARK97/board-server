@@ -4,8 +4,6 @@ import authController from '../controllers/auth/auth.controller';
 import fileController from '../controllers/file/file.controller';
 
 import { authMiddleware } from '../middleware/authMiddleware';
-import multer from 'multer';
-import uploadFileMiddleware from '../middleware/uploadMiddleware';
 
 const router = express.Router();
 
@@ -18,7 +16,7 @@ router.post('/login', authController.login);
 // router.post('logout',authController.logout)
 
 // file (업로드, 리스트 불러오기, 다운로드)
-router.post('/upload', uploadFileMiddleware, fileController.upload);
+router.post('/upload', fileController.upload);
 router.get('/files', fileController.getListFiles);
 router.get('/files/:name', fileController.download);
 

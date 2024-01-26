@@ -7,7 +7,6 @@ const directoryPath = 'uploads/';
 const upload = async (req: Request, res: Response) => {
     try {
         await uploadFile(req, res);
-
         if (req.file === undefined) {
             return res.status(400).send({ resultCd: 400, resultMsg: '파일을 업로드해 주세요.' });
         }
