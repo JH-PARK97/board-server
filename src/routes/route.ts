@@ -15,9 +15,9 @@ router.post('/user', authController.createUser);
 router.post('/login', authController.login);
 // router.post('logout',authController.logout)
 
-// file (업로드, 리스트 불러오기, 다운로드)
+// file (업로드, 이미지 불러오기)
 router.post('/upload', fileController.upload);
-router.get('/files', fileController.getListFiles);
-router.get('/files/:name', fileController.download);
+// router.get('/images', fileController.getImage);
+router.get('/images/:name', fileController.getImage);
 
 export default router;

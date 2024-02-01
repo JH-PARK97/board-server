@@ -19,25 +19,10 @@ const upload = async (req: Request, res: Response) => {
     }
 };
 
-const getListFiles = (req: Request, res: Response) => {
-    fs.readdir(directoryPath, function (error, files) {
-        if (error) {
-            if (!req.file) return null;
-            res.status(500).send({
-                resultCd: 500,
-                resultMsg: `Could not upload the file: ${req.file.originalname}. ${error}`,
-            });
-        }
-        let fileInfos: { name: string; url: string }[] = [];
-
-        files.forEach((file) => {
-            fileInfos.push({
-                name: file,
-                url: directoryPath,
-            });
-        });
-        res.status(200).send(fileInfos);
-    });
+const getImage = (req: Request, res: Response) => {
+    const imageName = req.params.imageName;
+    const readStream = fs.createReadStream(`images/${imageName}`);
+    readStream.pipe(res);
 };
 
 const download = (req: Request, res: Response) => {
@@ -54,4 +39,4 @@ const download = (req: Request, res: Response) => {
     });
 };
 
-export default { upload, getListFiles, download };
+export default { upload, getImage, download };

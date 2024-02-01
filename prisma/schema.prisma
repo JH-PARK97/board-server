@@ -11,13 +11,14 @@ datasource db {
 }
 
 model User {
-  id          Int    @id @default(autoincrement())
-  email       String @unique
+  id          Int      @id @default(autoincrement())
+  email       String   @unique
   age         Int
   gender      String
   phoneNumber String
   password    String
   posts       Post[]
+  profile     Profile?
 }
 
 model Post {
@@ -42,4 +43,18 @@ model Comment {
   // 하나의 글엔 여러개의 댓글이 있을 수 있지만, 각 댓글은 하나의 글에만 연결된다.
   post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId Int
+}
+
+model Profile {
+  id         Int    @id @default(autoincrement())
+  user       User   @relation(fields: [fk_user_id], references: [id])
+  avatarUrl  String
+  filename   String
+  mimeType   String
+  fk_user_id Int?
+
+  user User? @relation(fields: [fk_user_id], references: [id], onDelete: Cascade)
+
+  @@index([fk_user_id], map: "user_images_fk_user_id")
+  @@map("user_images")
 }
