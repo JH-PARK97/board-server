@@ -7,7 +7,7 @@ const MAX_SIZE = 2 * 1024 * 1024;
 
 const storage = multer.diskStorage({
     destination(req, file, callback) {
-        const uploadPath = 'uploads/';
+        const uploadPath = 'public/uploads/';
 
         if (!fs.existsSync(uploadPath)) {
             fs.mkdirSync(uploadPath);

@@ -11,14 +11,14 @@ datasource db {
 }
 
 model User {
-  id          Int      @id @default(autoincrement())
-  email       String   @unique
-  age         Int
-  gender      String
-  phoneNumber String
-  password    String
-  posts       Post[]
-  profile     Profile?
+  id              Int      @id @default(autoincrement())
+  email           String   @unique
+  age             Int
+  gender          String
+  phoneNumber     String
+  password        String
+  posts           Post[]
+  profile         Profile?
 }
 
 model Post {
@@ -47,14 +47,14 @@ model Comment {
 
 model Profile {
   id         Int    @id @default(autoincrement())
-  user       User   @relation(fields: [fk_user_id], references: [id])
   avatarUrl  String
   filename   String
   mimeType   String
-  fk_user_id Int?
+  // 유저와 프로필은 1:1 관계이므로 unique 속성이 필요함
+  fk_user_id Int?   @unique
 
   user User? @relation(fields: [fk_user_id], references: [id], onDelete: Cascade)
 
-  @@index([fk_user_id], map: "user_images_fk_user_id")
+  @@index([fk_user_id], map: "profiles_fk_user_id")
   @@map("user_images")
 }
