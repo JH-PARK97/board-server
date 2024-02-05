@@ -3,11 +3,18 @@ import { prisma } from '../../server';
 import bcrypt from 'bcrypt';
 import { Prisma, type User } from '@prisma/client';
 import jwt from 'jsonwebtoken';
+import { profileMiddleware } from '../../middleware/uploadMiddleware';
 
 const createUser = async (req: Request, res: Response) => {
     const SALT_ROUND = 10;
     try {
-        const { email, phoneNumber, age, gender, password } = req.body;
+        await profileMiddleware(req, res);
+
+        const { signUp } = req.body;
+        const signUpData = JSON.parse(signUp);
+        const { email, password, gender, phoneNumber, age } = signUpData;
+
+        const profileImagePath = req.file === undefined ? '' : req.file?.path;
         const hashPw = await bcrypt.hash(password, SALT_ROUND);
         const isDuplicateEmail = await prisma.user.findUnique({ where: { email } });
         if (isDuplicateEmail) {
@@ -22,6 +29,7 @@ const createUser = async (req: Request, res: Response) => {
                 age,
                 gender,
                 password: hashPw,
+                profileImagePath,
             },
         });
         return res.status(201).json({ resultCd: 200, data: createUser });
@@ -31,12 +39,15 @@ const createUser = async (req: Request, res: Response) => {
                 console.log('There is a unique constraint violation, a new user cannot be created with this email');
             }
         }
-        throw e;
+        console.log(e);
     }
 };
 
 function exclude<Key extends keyof User>(user: User, keys: Key[]): Omit<User, Key> {
-    return Object.fromEntries(Object.entries(user).filter(([key]) => !keys.includes(key as unknown as Key))) as Omit<User, Key>
+    return Object.fromEntries(Object.entries(user).filter(([key]) => !keys.includes(key as unknown as Key))) as Omit<
+        User,
+        Key
+    >;
 }
 
 const login = async (req: Request, res: Response) => {

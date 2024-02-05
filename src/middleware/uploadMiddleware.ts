@@ -22,10 +22,17 @@ const storage = multer.diskStorage({
 });
 
 const uploadFile = multer({
-    storage: storage,
+    storage,
     limits: { fileSize: MAX_SIZE },
 }).single('file');
 
+const profileImage = multer({
+    storage,
+    limits: { fileSize: MAX_SIZE },
+}).single('profile');
+
 const uploadFileMiddleware = util.promisify(uploadFile);
 
-export default uploadFileMiddleware;
+const profileMiddleware = util.promisify(profileImage);
+
+export { uploadFileMiddleware, profileMiddleware };
