@@ -50,24 +50,20 @@ async function main() {
                 },
             });
 
-            try {
-                const jwtSecretKey = process.env.TOKEN_SECRET_KEY as string;
-                const email = userData.data.email;
-                const user = await prisma.user.findUnique({ where: { email } });
-                console.log(user);
-                if (!user) {
-                    return res.status(401).json({ error: { resultCd: 401, resultMsg: '존재하지 않는 계정입니다.' } });
-                }
-                const token = jwt.sign({ email: user.email, age: user.age, gender: user.gender }, jwtSecretKey, {
-                    expiresIn: '1h',
-                });
-
-                return res.status(201).json({ resultCd: 200, data: user, token });
-            } catch (error) {
-                console.error(error);
+            const jwtSecretKey = process.env.TOKEN_SECRET_KEY as string;
+            const email = userData.data.email;
+            const user = await prisma.user.findUnique({ where: { email } });
+            if (!user) {
+                return res.status(401).json({ error: { resultCd: 401, resultMsg: '존재하지 않는 계정입니다.' } });
             }
+            const token = jwt.sign({ email: user.email, age: user.age, gender: user.gender }, jwtSecretKey, {
+                expiresIn: '1h',
+            });
+
+            res.status(201).json({ resultCd: 200, data: user, token });
         } catch (error) {
-            res.status(500).json({ message: 'Failed to authenticate' });
+            console.log(error);
+            res.status(500).json({ log: '/callback/github' });
         }
     });
 

@@ -9,7 +9,8 @@ const getUser = async (req: Request, res: Response) => {
         });
         res.status(200).json(getUser);
     } catch (e) {
-        res.status(500).json({ error: e });
+        console.error(e);
+        res.status(500).json();
     }
 };
 
