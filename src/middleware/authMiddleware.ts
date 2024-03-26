@@ -4,7 +4,10 @@ import jwt from 'jsonwebtoken';
 export function authMiddleware(req: Request, res: Response, next: NextFunction) {
     const jwtSecretKey = process.env.TOKEN_SECRET_KEY as string;
 
-    const token = req.headers.authorization;
+    const authHeader = req.headers.authorization;
+    const bearerToken = authHeader?.split(' ');
+    if (!bearerToken) return;
+    const token = bearerToken[1];
 
     if (!token) return res.status(401).json({ error: 'Access denied' });
     try {
@@ -14,7 +17,3 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) 
         res.status(401).json({ error: 'Invalid token' });
     }
 }
-
-// export function verifyToken async (req:Request, res:Response) {
-//     const token = req.headers.authorization;
-// }
