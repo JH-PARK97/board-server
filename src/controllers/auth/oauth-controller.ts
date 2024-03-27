@@ -41,13 +41,9 @@ export default async function githubCallback(req: Request, res: Response) {
         const user = await prisma.user.findUnique({ where: { email } });
         if (!user) {
             return res.status(200).json({
-                error: {
-                    resultCd: 401,
-                    resultMsg: '존재하지 않는 계정입니다.',
-                    data: {
-                        email: userData.data.email,
-                    },
-                },
+                resultCd: 401,
+                resultMsg: '존재하지 않는 계정입니다.',
+                email: userData.data.email,
             });
         }
         const token = jwt.sign({ email: user.email, age: user.age, gender: user.gender }, jwtSecretKey, {
