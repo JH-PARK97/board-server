@@ -12,7 +12,7 @@ const createUser = async (req: Request, res: Response) => {
 
         const { signUp } = req.body;
         const signUpData = JSON.parse(signUp);
-        const { email, password, gender, phoneNumber, age } = signUpData;
+        const { email, password, gender, phoneNumber, age, nickname } = signUpData;
 
         const profileImagePath = req.file === undefined ? '' : req.file?.path;
         const hashPw = await bcrypt.hash(password, SALT_ROUND);
@@ -30,6 +30,7 @@ const createUser = async (req: Request, res: Response) => {
                 gender,
                 password: hashPw,
                 profileImagePath,
+                nickname,
             },
         });
         return res.status(201).json({ resultCd: 200, data: createUser });
