@@ -12,9 +12,8 @@ const createUser = async (req: Request, res: Response) => {
 
         const { signUp } = req.body;
         const signUpData = JSON.parse(signUp);
-        const { email, password, gender, phoneNumber, age, nickname } = signUpData;
-
-        const profileImagePath = req.file === undefined ? '' : req.file?.path;
+        const { email, password, gender, phoneNumber, age, nickname, profile } = signUpData;
+        const profileImagePath = req.file ? req.file?.path : profile;
         const hashPw = await bcrypt.hash(password, SALT_ROUND);
         const isDuplicateEmail = await prisma.user.findUnique({ where: { email } });
         if (isDuplicateEmail) {
