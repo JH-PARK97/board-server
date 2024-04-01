@@ -12,6 +12,7 @@ const createBlogPost = async (req: Request, res: Response) => {
                 title,
                 content,
                 userId: user?.id,
+                nickname: user?.nickname,
             },
         });
         res.status(200).json({ data: newBlogPost, resultCd: 200 });

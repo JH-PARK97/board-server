@@ -39,6 +39,7 @@ model Post {
 
 model Comment {
   id        Int      @id @default(autoincrement())
+  nickname String
   content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
