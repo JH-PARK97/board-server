@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -18,24 +15,23 @@ model User {
   gender           String
   phoneNumber      String
   password         String
-  posts            Post[]
   profileImagePath String
+  posts            Post[]
   profile          Profile?
 }
 
 model Post {
-  id               Int      @id @default(autoincrement())
-  title            String
-  content          String
-  nickname         String
-  likeCount        Int      @default(0)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-  profileImagePath String
+  id        Int       @id @default(autoincrement())
+  title     String
+  content   String
+  likeCount Int       @default(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  
 
-  comments Comment[]
-  userId   Int
-  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments  Comment[]  
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Comment {
@@ -44,10 +40,8 @@ model Comment {
   content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  // 하나의 글엔 여러개의 댓글이 있을 수 있지만, 각 댓글은 하나의 글에만 연결된다.
-  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
-  postId Int
+  postId    Int
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
 }
 
 model Profile {
@@ -55,10 +49,8 @@ model Profile {
   avatarUrl  String
   filename   String
   mimeType   String
-  // 유저와 프로필은 1:1 관계이므로 unique 속성이 필요함
   fk_user_id Int?   @unique
-
-  user User? @relation(fields: [fk_user_id], references: [id], onDelete: Cascade)
+  user       User?  @relation(fields: [fk_user_id], references: [id], onDelete: Cascade)
 
   @@index([fk_user_id], map: "profiles_fk_user_id")
   @@map("user_images")

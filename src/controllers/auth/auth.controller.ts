@@ -69,7 +69,7 @@ const login = async (req: Request, res: Response) => {
             });
         }
 
-        const token = jwt.sign({ email: user.email, age: user.age, gender: user.gender }, jwtSecretKey, {
+        const token = jwt.sign({ email: user.email, age: user.age, gender: user.gender, id: user.id }, jwtSecretKey, {
             expiresIn: '1h',
         });
         // res.cookie('token', token, { httpOnly: true,  });

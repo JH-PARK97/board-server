@@ -1,9 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
+import jwt, { Jwt, JwtHeader } from 'jsonwebtoken';
 
+const jwtSecretKey = process.env.TOKEN_SECRET_KEY as string;
 export function authMiddleware(req: Request, res: Response, next: NextFunction) {
-    const jwtSecretKey = process.env.TOKEN_SECRET_KEY as string;
-
     const authHeader = req.headers.authorization;
     const bearerToken = authHeader?.split(' ');
     if (!bearerToken) return;
@@ -16,4 +15,15 @@ export function authMiddleware(req: Request, res: Response, next: NextFunction) 
     } catch (error) {
         res.status(401).json({ error: 'Invalid token' });
     }
+}
+
+export function decodeJWT(token: string) {
+    if (typeof token === 'string') {
+        const decodedToken = jwt.verify(token, jwtSecretKey) as any;
+        if (!decodedToken) return null;
+
+        const { id } = decodedToken;
+        return id;
+    }
+    return token;
 }
