@@ -70,7 +70,7 @@ const login = async (req: Request, res: Response) => {
         }
 
         const token = jwt.sign({ email: user.email, age: user.age, gender: user.gender, id: user.id }, jwtSecretKey, {
-            expiresIn: '1h',
+            expiresIn: '1d',
         });
         // res.cookie('token', token, { httpOnly: true,  });
         res.status(200).json({ resultCd: 200, data: exclude(user, ['password']), token });

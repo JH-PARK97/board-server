@@ -6,7 +6,9 @@ const createBlogPost = async (req: Request, res: Response) => {
     try {
         const { title, content } = req.body;
         const token = req.headers.authorization?.split(' ')[1];
-        if (!token) return null;
+        if (!token) {
+            return res.status(401).json({ error: 'Access denied. Token not provided.' });
+        }
 
         const userId = decodeJWT(token);
 
@@ -32,9 +34,37 @@ const createBlogPost = async (req: Request, res: Response) => {
 
 const getBlogPost = async (req: Request, res: Response) => {
     try {
-        const postList = await prisma.post.findMany();
-        console.log(postList);
+        const postList = await prisma.post.findMany({
+            include: {
+                user: {
+                    select: {
+                        nickname: true,
+                    },
+                },
+            },
+        });
         res.status(200).json({ data: postList, resultCd: 200 });
+    } catch (e) {
+        console.log(e);
+        res.status(500);
+    }
+};
+
+const getBlogPostById = async (req: Request, res: Response) => {
+    try {
+        const postById = await prisma.post.findUnique({
+            where: {
+                id: 1,
+            },
+            include: {
+                user: {
+                    select: {
+                        nickname: true,
+                    },
+                },
+            },
+        });
+        res.status(200).json({ data: postById, resultCd: 200 });
     } catch (e) {
         console.log(e);
         res.status(500);
@@ -44,4 +74,5 @@ const getBlogPost = async (req: Request, res: Response) => {
 export default {
     createBlogPost,
     getBlogPost,
+    getBlogPostById,
 };
