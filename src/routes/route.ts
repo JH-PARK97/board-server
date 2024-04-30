@@ -20,6 +20,6 @@ router.post('/login', authController.login);
 // file (업로드, 이미지 불러오기)
 router.post('/upload', fileController.upload);
 // router.get('/images', fileController.getImage);
-router.get('/images/:name', fileController.getImage);
+router.get('/images/:filename', fileController.getImage);
 
 export default router;
