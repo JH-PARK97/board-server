@@ -46,8 +46,8 @@ export default async function githubCallback(req: Request, res: Response) {
                 email: userData.data.email,
             });
         }
-        const token = jwt.sign({ email: user.email, age: user.age, gender: user.gender }, jwtSecretKey, {
-            expiresIn: '1h',
+        const token = jwt.sign({ email: user.email, age: user.age, gender: user.gender, id: user.id }, jwtSecretKey, {
+            expiresIn: '1d',
         });
 
         res.status(201).json({ resultCd: 200, data: user, token });

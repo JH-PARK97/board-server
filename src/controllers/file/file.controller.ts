@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { uploadFileMiddleware } from '../../middleware/uploadMiddleware';
+import { profileMiddleware, uploadFileMiddleware } from '../../middleware/uploadMiddleware';
 import fs from 'fs';
 import path from 'path';
 
@@ -7,7 +7,13 @@ const directoryPath = 'uploads/';
 
 const upload = async (req: Request, res: Response) => {
     try {
-        await uploadFileMiddleware(req, res);
+        const { path } = req.query;
+        if (path === 'posts') {
+            await uploadFileMiddleware(req, res);
+        } else if (path === 'profile') {
+            await profileMiddleware(req, res);
+        }
+
         if (!req.file) return null;
         const file = req.file;
         if (req.file === undefined) {
@@ -24,8 +30,11 @@ const upload = async (req: Request, res: Response) => {
 
 const getImage = (req: Request, res: Response) => {
     const filename = req.params.filename;
+    const imgPath = req.query.path;
 
-    res.sendFile(path.join(__dirname, `../../../public/uploads/${filename}`));
+    if (!path) return res.status(400).send({ resultCd: 400, resultMsg: 'path query를 입력해 주세요.' });
+
+    res.sendFile(path.join(__dirname, `../../../public/${imgPath}/${filename}`));
 };
 
 const download = (req: Request, res: Response) => {

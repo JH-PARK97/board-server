@@ -39,6 +39,7 @@ const getBlogPost = async (req: Request, res: Response) => {
                 user: {
                     select: {
                         nickname: true,
+                        profileImagePath: true,
                     },
                 },
             },
@@ -62,6 +63,7 @@ const getBlogPostById = async (req: Request, res: Response) => {
                 user: {
                     select: {
                         nickname: true,
+                        profileImagePath: true,
                     },
                 },
             },
