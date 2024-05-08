@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt';
 import { Prisma, type User } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 import { profileMiddleware } from '../../middleware/uploadMiddleware';
+import { JWT_SECRET_KEY } from '../../constants';
 
 const createUser = async (req: Request, res: Response) => {
     const SALT_ROUND = 10;
@@ -51,7 +52,6 @@ function exclude<Key extends keyof User>(user: User, keys: Key[]): Omit<User, Ke
 }
 
 const login = async (req: Request, res: Response) => {
-    const jwtSecretKey = process.env.TOKEN_SECRET_KEY as string;
     try {
         const { email, password } = req.body;
         const user = await prisma.user.findUnique({ where: { email } });
@@ -69,7 +69,7 @@ const login = async (req: Request, res: Response) => {
             });
         }
 
-        const token = jwt.sign({ email: user.email, age: user.age, gender: user.gender, id: user.id }, jwtSecretKey, {
+        const token = jwt.sign({ email: user.email, age: user.age, gender: user.gender, id: user.id }, JWT_SECRET_KEY, {
             expiresIn: '1d',
         });
         // res.cookie('token', token, { httpOnly: true,  });

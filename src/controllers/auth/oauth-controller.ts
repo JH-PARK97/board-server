@@ -2,6 +2,7 @@ import axios from 'axios';
 import { Request, Response } from 'express';
 import { prisma } from '../../server';
 import jwt from 'jsonwebtoken';
+import { JWT_SECRET_KEY } from '../../constants';
 
 const githubConfig = {
     clientId: process.env.GITHUB_CLIENT_ID,
@@ -36,7 +37,6 @@ export default async function githubCallback(req: Request, res: Response) {
             },
         });
 
-        const jwtSecretKey = process.env.TOKEN_SECRET_KEY as string;
         const email = userData.data.email;
         const user = await prisma.user.findUnique({ where: { email } });
         if (!user) {
@@ -46,7 +46,7 @@ export default async function githubCallback(req: Request, res: Response) {
                 email: userData.data.email,
             });
         }
-        const token = jwt.sign({ email: user.email, age: user.age, gender: user.gender, id: user.id }, jwtSecretKey, {
+        const token = jwt.sign({ email: user.email, age: user.age, gender: user.gender, id: user.id }, JWT_SECRET_KEY, {
             expiresIn: '1d',
         });
 

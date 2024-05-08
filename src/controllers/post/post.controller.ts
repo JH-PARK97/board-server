@@ -1,18 +1,11 @@
 import { Request, Response } from 'express';
 import { prisma } from '../../server';
-import { decodeJWT } from '../../middleware/authMiddleware';
 
 const createBlogPost = async (req: Request, res: Response) => {
     try {
         const { title, content } = req.body;
-        const token = req.headers.authorization?.split(' ')[1];
-        if (!token) {
-            return res.status(401).json({ error: 'Access denied. Token not provided.' });
-        }
 
-        const userId = decodeJWT(token);
-
-        const user = await prisma.user.findUnique({ where: { id: userId } });
+        const user = (req as any).user;
 
         if (!user) return res.status(401).json({ error: '존재하지 않는 유저입니다.' });
 
@@ -21,7 +14,7 @@ const createBlogPost = async (req: Request, res: Response) => {
                 title,
                 content,
                 user: {
-                    connect: { id: userId },
+                    connect: { id: user.id },
                 },
             },
         });
@@ -29,6 +22,13 @@ const createBlogPost = async (req: Request, res: Response) => {
     } catch (e) {
         console.log(e);
         res.status(500).json();
+    }
+};
+
+const updateBlogPost = async (req: Request, res: Response) => {
+    try {
+    } catch (e) {
+        console.error(e);
     }
 };
 
