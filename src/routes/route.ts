@@ -10,6 +10,7 @@ const router = express.Router();
 // 게시글
 router.post('/post', authMiddleware, postController.createBlogPost);
 router.get('/post', postController.getBlogPost);
+router.put('/post/:id', authMiddleware, postController.updateBlogPost);
 router.get('/post/:id', postController.getBlogPostById);
 
 // auth (로그인, 로그아웃, 회원가입)

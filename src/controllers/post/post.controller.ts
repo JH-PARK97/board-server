@@ -27,8 +27,23 @@ const createBlogPost = async (req: Request, res: Response) => {
 
 const updateBlogPost = async (req: Request, res: Response) => {
     try {
+        const { title, content } = req.body;
+        const user = (req as any).user;
+        console.log(res);
+        const updateBlogPost = await prisma.post.update({
+            where: { id: Number(req.params.id) },
+            data: {
+                title,
+                content,
+                user: {
+                    connect: { id: user.id },
+                },
+            },
+        });
+        res.status(200).json({ data: updateBlogPost, resultCd: 200 });
     } catch (e) {
         console.error(e);
+        res.status(500).json();
     }
 };
 
@@ -79,4 +94,5 @@ export default {
     createBlogPost,
     getBlogPost,
     getBlogPostById,
+    updateBlogPost,
 };

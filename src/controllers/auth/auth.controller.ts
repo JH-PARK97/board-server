@@ -5,6 +5,7 @@ import { Prisma, type User } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 import { profileMiddleware } from '../../middleware/uploadMiddleware';
 import { JWT_SECRET_KEY } from '../../constants';
+import { exclude } from '../../utils/utils';
 
 const createUser = async (req: Request, res: Response) => {
     const SALT_ROUND = 10;
@@ -43,13 +44,6 @@ const createUser = async (req: Request, res: Response) => {
         console.log(e);
     }
 };
-
-function exclude<Key extends keyof User>(user: User, keys: Key[]): Omit<User, Key> {
-    return Object.fromEntries(Object.entries(user).filter(([key]) => !keys.includes(key as unknown as Key))) as Omit<
-        User,
-        Key
-    >;
-}
 
 const login = async (req: Request, res: Response) => {
     try {
