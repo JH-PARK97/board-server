@@ -34,7 +34,7 @@ const createUser = async (req: Request, res: Response) => {
                 nickname,
             },
         });
-        return res.status(201).json({ resultCd: 200, data: createUser });
+        return res.status(200).json({ resultCd: 200, data: createUser });
     } catch (e) {
         if (e instanceof Prisma.PrismaClientKnownRequestError) {
             if (e.code === 'P2002') {

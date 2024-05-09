@@ -8,10 +8,12 @@ import { authMiddleware } from '../middleware/authMiddleware';
 const router = express.Router();
 
 // 게시글
+router.get('/post', postController.getPostList);
 router.post('/post', authMiddleware, postController.createBlogPost);
-router.get('/post', postController.getBlogPost);
-router.put('/post/:id', authMiddleware, postController.updateBlogPost);
+
 router.get('/post/:id', postController.getBlogPostById);
+router.put('/post/:id', authMiddleware, postController.updateBlogPost);
+router.delete('/post/:id', authMiddleware, postController.deleteBlogPostById);
 
 // auth (로그인, 로그아웃, 회원가입)
 router.post('/user', authController.createUser);

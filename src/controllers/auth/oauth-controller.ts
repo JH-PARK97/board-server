@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import { prisma } from '../../server';
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET_KEY } from '../../constants';
+import { exclude } from '../../utils/utils';
 
 const githubConfig = {
     clientId: process.env.GITHUB_CLIENT_ID,
@@ -50,7 +51,7 @@ export default async function githubCallback(req: Request, res: Response) {
             expiresIn: '1d',
         });
 
-        res.status(201).json({ resultCd: 200, data: user, token });
+        res.status(200).json({ resultCd: 200, data: exclude(user, ['password']), token });
     } catch (error) {
         console.log(error);
         res.status(500).json({ log: '/callback/github' });
