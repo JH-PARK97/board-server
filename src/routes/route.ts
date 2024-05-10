@@ -2,6 +2,7 @@ import express from 'express';
 import postController from '../controllers/post/post.controller';
 import authController from '../controllers/auth/auth.controller';
 import fileController from '../controllers/file/file.controller';
+import commentController from '../controllers/comment/comment.controller';
 
 import { authMiddleware } from '../middleware/authMiddleware';
 
@@ -14,6 +15,9 @@ router.post('/post', authMiddleware, postController.createBlogPost);
 router.get('/post/:id', postController.getBlogPostById);
 router.put('/post/:id', authMiddleware, postController.updateBlogPost);
 router.delete('/post/:id', authMiddleware, postController.deleteBlogPostById);
+
+// 댓글
+router.post('/comment/:id', authMiddleware, commentController.createComment);
 
 // auth (로그인, 로그아웃, 회원가입)
 router.post('/user', authController.createUser);

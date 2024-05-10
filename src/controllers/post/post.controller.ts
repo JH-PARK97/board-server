@@ -29,7 +29,6 @@ const updateBlogPost = async (req: Request, res: Response) => {
     try {
         const { title, content } = req.body;
         const user = (req as any).user;
-        console.log(res);
         const updatePost = await prisma.post.update({
             where: { id: Number(req.params.id) },
             data: {
