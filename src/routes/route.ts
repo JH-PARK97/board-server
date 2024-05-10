@@ -18,6 +18,7 @@ router.delete('/post/:id', authMiddleware, postController.deleteBlogPostById);
 
 // 댓글
 router.post('/comment/:id', authMiddleware, commentController.createComment);
+router.get('/comment/:id', commentController.getComment);
 
 // auth (로그인, 로그아웃, 회원가입)
 router.post('/user', authController.createUser);
