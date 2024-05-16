@@ -20,6 +20,9 @@ router.delete('/post/:id', authMiddleware, postController.deleteBlogPostById);
 router.post('/comment/:id', authMiddleware, commentController.createComment);
 router.get('/comment/:id', commentController.getComment);
 
+// 답글
+router.post('/reply/:id', authMiddleware, commentController.createReply);
+
 // auth (로그인, 로그아웃, 회원가입)
 router.post('/user', authController.createUser);
 router.post('/login', authController.login);
