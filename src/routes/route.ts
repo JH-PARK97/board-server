@@ -20,10 +20,13 @@ router.delete('/post/:id', authMiddleware, postController.deleteBlogPostById);
 router.get('/comment/:postId', commentController.getComment);
 router.post('/comment/:postId', authMiddleware, commentController.createComment);
 router.put('/comment/:commentId', authMiddleware, commentController.updateComment);
-router.delete('/comment/:commentId', authMiddleware, commentController.deleteComment)
+router.delete('/comment/:commentId', authMiddleware, commentController.deleteComment);
 
 // 답글
-router.post('/reply/:id', authMiddleware, commentController.createReply);
+router.get('/reply/:parentCommentId', authMiddleware, commentController.getReply);
+router.post('/reply/:parentCommentId', authMiddleware, commentController.createReply);
+router.put('/reply/parentId/:parentCommentId/replyId/:replyId', authMiddleware, commentController.updateReply);
+router.delete('/reply/parentId/:parentCommentId/replyId/:replyId', authMiddleware, commentController.deleteReply);
 
 // auth (로그인, 로그아웃, 회원가입)
 router.post('/user', authController.createUser);
