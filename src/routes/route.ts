@@ -5,6 +5,7 @@ import fileController from '../controllers/file/file.controller';
 import commentController from '../controllers/comment/comment.controller';
 
 import { authMiddleware } from '../middleware/authMiddleware';
+import userController from '../controllers/user/user.controller';
 
 const router = express.Router();
 
@@ -12,7 +13,7 @@ const router = express.Router();
 router.get('/post', postController.getPostList);
 router.post('/post', authMiddleware, postController.createBlogPost);
 
-router.get('/post/:id', postController.getBlogPostById);
+router.get('/post/:id', postController.getBlogPostDetailById);
 router.put('/post/:id', authMiddleware, postController.updateBlogPost);
 router.delete('/post/:id', authMiddleware, postController.deleteBlogPostById);
 
@@ -37,5 +38,9 @@ router.post('/login', authController.login);
 router.post('/upload', fileController.upload);
 // router.get('/images', fileController.getImage);
 router.get('/images/:filename', fileController.getImage);
+
+// 유저정보
+router.get('/user', userController.getUser);
+router.get('/user/:userId', userController.getUserPostById);
 
 export default router;

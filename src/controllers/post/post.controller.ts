@@ -56,6 +56,9 @@ const getPostList = async (req: Request, res: Response) => {
                         profileImagePath: true,
                     },
                 },
+                _count: {
+                    select: { comments: true },
+                },
             },
         });
         res.status(200).json({ data: postList, resultCd: 200 });
@@ -65,7 +68,7 @@ const getPostList = async (req: Request, res: Response) => {
     }
 };
 
-const getBlogPostById = async (req: Request, res: Response) => {
+const getBlogPostDetailById = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
 
@@ -122,7 +125,7 @@ const deleteBlogPostById = async (req: Request, res: Response) => {
 export default {
     createBlogPost,
     getPostList,
-    getBlogPostById,
+    getBlogPostDetailById,
     updateBlogPost,
     deleteBlogPostById,
 };
