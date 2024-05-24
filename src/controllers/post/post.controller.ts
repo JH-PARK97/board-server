@@ -48,7 +48,7 @@ const updateBlogPost = async (req: Request, res: Response) => {
 
 const getPostList = async (req: Request, res: Response) => {
     try {
-        const postList = await prisma.post.findMany({
+        const _postList = await prisma.post.findMany({
             include: {
                 user: {
                     select: {
@@ -56,15 +56,42 @@ const getPostList = async (req: Request, res: Response) => {
                         profileImagePath: true,
                     },
                 },
+                comments: {
+                    select: {
+                        _count: {
+                            select: {
+                                reply: true,
+                            },
+                        },
+                    },
+                },
                 _count: {
                     select: { comments: true },
                 },
             },
         });
+
+        const postList = _postList.map((post) => {
+            const totalReplies = post.comments.reduce((acc, comment) => acc + comment._count.reply, 0);
+            const totalCommentCount = post._count.comments + totalReplies;
+
+            return {
+                id: post.id,
+                title: post.title,
+                content: post.content,
+                likeCount: post.likeCount,
+                createdAt: post.createdAt,
+                updatedAt: post.updatedAt,
+                userId: post.userId,
+                user: post.user,
+                totalCommentCount,
+            };
+        });
+
         res.status(200).json({ data: postList, resultCd: 200 });
     } catch (e) {
         console.log(e);
-        res.status(500);
+        res.status(500).json({ resultCd: 500, message: 'Internal Server Error' });
     }
 };
 
