@@ -18,11 +18,14 @@ const createUser = async (req: Request, res: Response) => {
         const profileImagePath = req.file ? req.file?.path : profile;
         const hashPw = await bcrypt.hash(password, SALT_ROUND);
         const isDuplicateEmail = await prisma.user.findUnique({ where: { email } });
+        const isDuplicateNickname = await prisma.user.findUnique({ where: { nickname } });
         if (isDuplicateEmail) {
-            {
-                return res.status(409).json({ error: { resultCd: 409, resultMsg: '이미 존재하는 이메일입니다.' } });
-            }
+            return res.status(409).json({ error: { resultCd: 409, resultMsg: '이미 존재하는 이메일입니다.' } });
         }
+        if (isDuplicateNickname) {
+            return res.status(409).json({ error: { resultCd: 409, resultMsg: '이미 존재하는 닉네임입니다.' } });
+        }
+
         const createUser = await prisma.user.create({
             data: {
                 email,
