@@ -11,7 +11,7 @@ const getComment = async (req: Request, res: Response) => {
 
             include: {
                 user: { select: { nickname: true, id: true, profileImagePath: true } },
-                reply: { include: { user: { select: { nickname: true, id: true, profileImagePath: true } } } },
+                replies: { include: { user: { select: { nickname: true, id: true, profileImagePath: true } } } },
             },
 
             orderBy: {

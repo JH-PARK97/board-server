@@ -1,11 +1,13 @@
 import express from 'express';
+
 import postController from '../controllers/post/post.controller';
 import authController from '../controllers/auth/auth.controller';
 import fileController from '../controllers/file/file.controller';
 import commentController from '../controllers/comment/comment.controller';
+import userController from '../controllers/user/user.controller';
+import categoryController from '../controllers/category/category.controller';
 
 import { authMiddleware } from '../middleware/authMiddleware';
-import userController from '../controllers/user/user.controller';
 
 const router = express.Router();
 
@@ -42,5 +44,8 @@ router.get('/images/:filename', fileController.getImage);
 // 유저정보
 router.get('/user', userController.getUser);
 router.get('/user/:userId', userController.getUserPostById);
+
+// 카테고리(해당 유저 게시글의 카테고리)
+router.get('/category/:userId', categoryController.getCategories);
 
 export default router;

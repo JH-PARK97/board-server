@@ -54,7 +54,7 @@ const getUserPostById = async (req: Request, res: Response) => {
                             select: {
                                 _count: {
                                     select: {
-                                        reply: true,
+                                        replies: true,
                                     },
                                 },
                             },
@@ -72,7 +72,7 @@ const getUserPostById = async (req: Request, res: Response) => {
         if (!_getUserPost) return null;
 
         const formattedPosts = _getUserPost.posts.map((post) => {
-            const totalReplies = post.comments.reduce((acc, comment) => acc + comment._count.reply, 0);
+            const totalReplies = post.comments.reduce((acc, comment) => acc + comment._count.replies, 0);
             const totalCommentCount = post._count.comments + totalReplies;
 
             return {

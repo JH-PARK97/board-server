@@ -8,30 +8,33 @@ datasource db {
 }
 
 model User {
-  id               Int       @id @default(autoincrement())
-  email            String    @unique
-  nickname         String    @unique
+  id               Int        @id @default(autoincrement())
+  email            String     @unique
+  nickname         String     @unique
   age              Int
   gender           String
   phoneNumber      String
   password         String
   profileImagePath String
-  Comment          Comment[]
   posts            Post[]
-  Reply            Reply[]
-  profile          Profile?
+  comment          Comment[]
+  replies          Reply[]
+  categories       Category[]
+
+  profile Profile?
 }
 
 model Post {
-  id        Int       @id @default(autoincrement())
-  title     String
-  content   String
-  likeCount Int       @default(0)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  userId    Int
-  comments  Comment[]
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id         Int        @id @default(autoincrement())
+  title      String
+  content    String
+  likeCount  Int        @default(0)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  userId     Int
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments   Comment[]
+  categories Category[]
 }
 
 model Comment {
@@ -43,7 +46,7 @@ model Comment {
   postId    Int
   post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  reply     Reply[]
+  replies  Reply[]
 }
 
 model Reply {
@@ -55,6 +58,22 @@ model Reply {
   commentId Int
   comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Category {
+  id     Int    @id @default(autoincrement())
+  name   String
+  tags   Tag[]
+  posts  Post[]
+  User   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+}
+
+model Tag {
+  id         Int      @id @default(autoincrement())
+  name       String
+  categoryId Int
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 }
 
 model Profile {

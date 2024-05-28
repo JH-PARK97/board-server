@@ -60,7 +60,7 @@ const getPostList = async (req: Request, res: Response) => {
                     select: {
                         _count: {
                             select: {
-                                reply: true,
+                                replies: true,
                             },
                         },
                     },
@@ -72,7 +72,7 @@ const getPostList = async (req: Request, res: Response) => {
         });
 
         const postList = _postList.map((post) => {
-            const totalReplies = post.comments.reduce((acc, comment) => acc + comment._count.reply, 0);
+            const totalReplies = post.comments.reduce((acc, comment) => acc + comment._count.replies, 0);
             const totalCommentCount = post._count.comments + totalReplies;
 
             return {
