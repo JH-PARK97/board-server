@@ -3,7 +3,21 @@ import { prisma } from '../../server';
 
 const getUser = async (req: Request, res: Response) => {
     try {
-        const getUser = await prisma.user.findMany();
+        const { userId: _userId } = req.query;
+        const userId = Number(_userId);
+        let getUser;
+        if (userId) {
+            getUser = await prisma.user.findUnique({
+                where: { id: userId },
+            });
+        } else {
+            getUser = await prisma.user.findMany();
+        }
+
+        if (!getUser) {
+            return res.status(404).json({ resultCd: 404, message: '유저 정보가 없습니다.' });
+        }
+
         res.status(200).json({ resultCd: 200, data: getUser });
     } catch (e) {
         console.error(e);
@@ -14,16 +28,27 @@ const getUser = async (req: Request, res: Response) => {
 const getUserPostById = async (req: Request, res: Response) => {
     try {
         const { userId: _userId } = req.params;
+        const { pageNo: _pageNo, pageSize: _pageSize } = req.query;
         const userId = Number(_userId);
+        const pageSize = Number(_pageSize) || 7;
+        const pageNo = (Number(_pageNo) - 1) * pageSize || 0;
+
         const _getUserPost = await prisma.user.findUnique({
             where: { id: userId },
+
             select: {
                 id: true,
                 email: true,
                 nickname: true,
                 profileImagePath: true,
-
+                _count: {
+                    select: {
+                        posts: true,
+                    },
+                },
                 posts: {
+                    skip: pageNo,
+                    take: pageSize,
                     include: {
                         comments: {
                             select: {
@@ -68,6 +93,7 @@ const getUserPostById = async (req: Request, res: Response) => {
             nickname: _getUserPost.nickname,
             profileImagePath: _getUserPost.profileImagePath,
             posts: formattedPosts,
+            totalCount: _getUserPost._count.posts,
         };
 
         res.status(200).json({ resultCd: 200, data: getUserPosts });
