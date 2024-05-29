@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { prisma } from '../../server';
-
 const getCategories = async (req: Request, res: Response) => {
     try {
         const { userId } = req.params;
@@ -32,24 +31,25 @@ const getCategories = async (req: Request, res: Response) => {
             return res.status(400).json({ resultMsg: '잘못된 유저정보입니다.', resultCd: 200 });
         }
         const formattedCategories = getCategoriesByUserId.map((category) => {
-            console.log(category);
+            const formattedTags = category.tags.map((tag) => {
+                const { _count, ...rest } = tag;
+                return {
+                    ...rest,
+                    count: _count.posts,
+                };
+            });
+
+            const { _count, ...restCategory } = category;
             return {
-                ...category,
-                tags: category.tags.map((tag) => ({
-                    ...tag,
-                    count: tag._count.posts,
-                    _count: undefined, // _count 필드 제거
-                })),
-                _count: undefined,
-                totalCount: category._count.posts,
+                ...restCategory,
+                tags: formattedTags,
+                totalCount: _count.posts,
             };
         });
 
-        console.log('formattedCategories : ', formattedCategories);
         res.status(200).json({ data: formattedCategories, resultCd: 200 });
     } catch (e) {
         console.log(e);
     }
 };
-
 export default { getCategories };
