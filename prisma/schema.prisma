@@ -16,12 +16,11 @@ model User {
   phoneNumber      String
   password         String
   profileImagePath String
-  posts            Post[]
-  comment          Comment[]
-  replies          Reply[]
   categories       Category[]
-
-  profile Profile?
+  comment          Comment[]
+  posts            Post[]
+  replies          Reply[]
+  profile          Profile?
 }
 
 model Post {
@@ -32,9 +31,11 @@ model Post {
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
   userId     Int
-  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tagId      Int?
   comments   Comment[]
-  categories Category[]
+  tag        Tag?       @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categories Category[] @relation("CategoryToPost")
 }
 
 model Comment {
@@ -44,9 +45,9 @@ model Comment {
   updatedAt DateTime @updatedAt
   userId    Int
   postId    Int
-  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  replies  Reply[]
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  replies   Reply[]
 }
 
 model Reply {
@@ -56,23 +57,24 @@ model Reply {
   updatedAt DateTime @updatedAt
   userId    Int
   commentId Int
-  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
 }
 
 model Category {
   id     Int    @id @default(autoincrement())
   name   String
-  tags   Tag[]
-  posts  Post[]
-  User   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int
+  User   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tags   Tag[]
+  posts  Post[] @relation("CategoryToPost")
 }
 
 model Tag {
   id         Int      @id @default(autoincrement())
   name       String
   categoryId Int
+  posts      Post[]
   category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 }
 

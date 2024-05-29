@@ -39,6 +39,7 @@ const getUserPostById = async (req: Request, res: Response) => {
             select: {
                 id: true,
                 email: true,
+                categories: true,
                 nickname: true,
                 profileImagePath: true,
                 _count: {
@@ -50,6 +51,9 @@ const getUserPostById = async (req: Request, res: Response) => {
                     skip: pageNo,
                     take: pageSize,
                     include: {
+                        categories: true,
+
+                        tag: true,
                         comments: {
                             select: {
                                 _count: {
@@ -74,7 +78,6 @@ const getUserPostById = async (req: Request, res: Response) => {
         const formattedPosts = _getUserPost.posts.map((post) => {
             const totalReplies = post.comments.reduce((acc, comment) => acc + comment._count.replies, 0);
             const totalCommentCount = post._count.comments + totalReplies;
-
             return {
                 id: post.id,
                 title: post.title,
@@ -84,6 +87,8 @@ const getUserPostById = async (req: Request, res: Response) => {
                 updatedAt: post.updatedAt,
                 userId: post.userId,
                 totalCommentCount,
+                categoryId: post.categories,
+                tag: post.tag,
             };
         });
 
