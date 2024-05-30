@@ -26,7 +26,7 @@ const getUser = async (req: Request, res: Response) => {
 const getUserPostById = async (req: Request, res: Response) => {
     try {
         const { userId: _userId } = req.params;
-        const { pageNo: _pageNo, pageSize: _pageSize } = req.query;
+        const { pageNo: _pageNo, pageSize: _pageSize, tag, category } = req.query;
         const userId = Number(_userId);
         const pageSize = Number(_pageSize) || 7;
         const pageNo = (Number(_pageNo) - 1) * pageSize || 0;
@@ -46,11 +46,14 @@ const getUserPostById = async (req: Request, res: Response) => {
                     },
                 },
                 posts: {
+                    where: {
+                        ...(category ? { categories: { some: { id: Number(category) } } } : {}),
+                        ...(tag ? { tag: { id: Number(tag) } } : {}),
+                    },
                     skip: pageNo,
                     take: pageSize,
                     include: {
                         categories: true,
-
                         tag: true,
                         comments: {
                             select: {
