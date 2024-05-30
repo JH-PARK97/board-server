@@ -26,14 +26,13 @@ const getUser = async (req: Request, res: Response) => {
 const getUserPostById = async (req: Request, res: Response) => {
     try {
         const { userId: _userId } = req.params;
-        const { pageNo: _pageNo, pageSize: _pageSize, tag, category } = req.query;
+        const { pageNo: _pageNo, pageSize: _pageSize, category } = req.query;
         const userId = Number(_userId);
         const pageSize = Number(_pageSize) || 7;
         const pageNo = (Number(_pageNo) - 1) * pageSize || 0;
 
         const userPost = await prisma.user.findUnique({
             where: { id: userId },
-
             select: {
                 id: true,
                 email: true,
@@ -47,14 +46,13 @@ const getUserPostById = async (req: Request, res: Response) => {
                 },
                 posts: {
                     where: {
-                        ...(category ? { categories: { some: { id: Number(category) } } } : {}),
-                        ...(tag ? { tag: { id: Number(tag) } } : {}),
+                        ...(category ? { category: { id: Number(category) } } : {}),
                     },
                     skip: pageNo,
                     take: pageSize,
                     include: {
-                        categories: true,
-                        tag: true,
+                        category: true,
+                        tags: true,
                         comments: {
                             select: {
                                 _count: {
@@ -73,7 +71,6 @@ const getUserPostById = async (req: Request, res: Response) => {
                 },
             },
         });
-
         if (!userPost) return res.status(404).json({ message: 'User not found' });
 
         const formattedPosts = userPost.posts.map((post) => {
@@ -88,8 +85,8 @@ const getUserPostById = async (req: Request, res: Response) => {
                 updatedAt: post.updatedAt,
                 userId: post.userId,
                 totalCommentCount,
-                categoryId: post.categories,
-                tag: post.tag,
+                categoryId: post.categoryId,
+                tag: post.tags,
             };
         });
 

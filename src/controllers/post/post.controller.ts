@@ -3,24 +3,31 @@ import { prisma } from '../../server';
 
 const createBlogPost = async (req: Request, res: Response) => {
     try {
-        const { title, content } = req.body;
+        const { title, content, categoryId, tagIds } = req.body;
 
         const user = (req as any).user;
 
         if (!user) return res.status(400).json({ error: '존재하지 않는 유저입니다.', resultCd: 400 });
-
         const createPost = await prisma.post.create({
             data: {
+                user: {
+                    connect: {
+                        id: user.id,
+                    },
+                },
+                category: {
+                    connect: {
+                        id: 1,
+                    },
+                },
                 title,
                 content,
-                user: {
-                    connect: { id: user.id },
-                },
             },
         });
+
         res.status(200).json({ data: createPost, resultCd: 200 });
     } catch (e) {
-        console.log(e);
+        console.error(e);
         res.status(500).json();
     }
 };

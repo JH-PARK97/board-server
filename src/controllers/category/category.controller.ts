@@ -5,20 +5,11 @@ const getCategories = async (req: Request, res: Response) => {
         const { userId } = req.params;
         const { category } = req.query;
 
-        const getCategoriesByUserId = await prisma.category.findMany({
+        const getCategetCategoriesByuserId = await prisma.category.findMany({
             where: {
-                ...(category ? { userId: Number(userId), id: Number(category) } : { userId: Number(userId) }),
+                userId: Number(userId),
             },
             include: {
-                tags: {
-                    include: {
-                        _count: {
-                            select: {
-                                posts: true,
-                            },
-                        },
-                    },
-                },
                 _count: {
                     select: {
                         posts: true,
@@ -27,22 +18,14 @@ const getCategories = async (req: Request, res: Response) => {
             },
         });
 
-        if (!getCategoriesByUserId) {
+        if (!getCategetCategoriesByuserId) {
             return res.status(400).json({ resultMsg: '잘못된 유저정보입니다.', resultCd: 200 });
         }
-        const formattedCategories = getCategoriesByUserId.map((category) => {
-            const formattedTags = category.tags.map((tag) => {
-                const { _count, ...rest } = tag;
-                return {
-                    ...rest,
-                    count: _count.posts,
-                };
-            });
 
+        const formattedCategories = getCategetCategoriesByuserId.map((category) => {
             const { _count, ...restCategory } = category;
             return {
                 ...restCategory,
-                tags: formattedTags,
                 totalCount: _count.posts,
             };
         });

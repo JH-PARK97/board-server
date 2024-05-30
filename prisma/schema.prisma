@@ -23,19 +23,33 @@ model User {
   profile          Profile?
 }
 
+model Category {
+  id     Int    @id @default(autoincrement())
+  name   String @unique
+  userId Int
+  User   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  posts Post[]
+}
+
+model Tag {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  posts Post[] @relation("PostTags")
+}
+
 model Post {
-  id         Int        @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   title      String
   content    String
-  likeCount  Int        @default(0)
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  likeCount  Int       @default(0)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
   userId     Int
-  tagId      Int?
+  categoryId Int
   comments   Comment[]
-  tag        Tag?       @relation(fields: [tagId], references: [id], onDelete: Cascade)
-  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  categories Category[] @relation("CategoryToPost")
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category   Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  tags       Tag[]     @relation("PostTags")
 }
 
 model Comment {
@@ -59,23 +73,6 @@ model Reply {
   commentId Int
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
-}
-
-model Category {
-  id     Int    @id @default(autoincrement())
-  name   String
-  userId Int
-  User   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tags   Tag[]
-  posts  Post[] @relation("CategoryToPost")
-}
-
-model Tag {
-  id         Int      @id @default(autoincrement())
-  name       String
-  categoryId Int
-  posts      Post[]
-  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 }
 
 model Profile {
