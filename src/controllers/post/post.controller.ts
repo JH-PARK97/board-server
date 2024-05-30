@@ -3,35 +3,81 @@ import { prisma } from '../../server';
 
 const createBlogPost = async (req: Request, res: Response) => {
     try {
-        const { title, content, categoryId, tagIds } = req.body;
-
+        const { title, content, categoryId = 7, categoryName = '테스트용77', tagId } = req.body;
         const user = (req as any).user;
 
-        if (!user) return res.status(400).json({ error: '존재하지 않는 유저입니다.', resultCd: 400 });
-        const createPost = await prisma.post.create({
-            data: {
-                user: {
-                    connect: {
-                        id: user.id,
-                    },
-                },
-                category: {
-                    connect: {
-                        id: 1,
-                    },
-                },
-                title,
-                content,
-            },
-        });
+        if (!user) {
+            return res.status(400).json({ error: '존재하지 않는 유저입니다.', resultCd: 400 });
+        }
 
-        res.status(200).json({ data: createPost, resultCd: 200 });
+        // 입력된 카테고리ID가 존재하는 경우
+        if (categoryId) {
+            const existingCategory = await prisma.category.findUnique({
+                where: {
+                    id: categoryId,
+                },
+            });
+
+            // 존재하지 않는 카테고리인 경우 새로 생성 카테고리를 생성하고 게시글 등록
+            if (!existingCategory) {
+                const createCategory = await prisma.category.create({
+                    data: {
+                        name: categoryName,
+                        User: {
+                            connect: {
+                                id: user.id,
+                            },
+                        },
+                    },
+                });
+
+                if (createCategory) {
+                    const createPost = await prisma.post.create({
+                        data: {
+                            user: {
+                                connect: {
+                                    id: user.id,
+                                },
+                            },
+                            category: {
+                                connect: {
+                                    id: createCategory.id,
+                                },
+                            },
+                            title,
+                            content,
+                        },
+                    });
+
+                    res.status(200).json({ data: createPost, resultCd: 200 });
+                }
+            } else {
+                // 존재하는 경우 해당 카테고리에 바로 게시글 등록
+                const createPost = await prisma.post.create({
+                    data: {
+                        user: {
+                            connect: {
+                                id: user.id,
+                            },
+                        },
+                        category: {
+                            connect: {
+                                id: categoryId,
+                            },
+                        },
+                        title,
+                        content,
+                    },
+                });
+
+                res.status(200).json({ data: createPost, resultCd: 200 });
+            }
+        }
     } catch (e) {
         console.error(e);
-        res.status(500).json();
+        res.status(500).json({ error: 'Internal server error', resultCd: 500 });
     }
 };
-
 const updateBlogPost = async (req: Request, res: Response) => {
     try {
         const { title, content } = req.body;

@@ -85,7 +85,7 @@ const getUserPostById = async (req: Request, res: Response) => {
                 updatedAt: post.updatedAt,
                 userId: post.userId,
                 totalCommentCount,
-                categoryId: post.categoryId,
+                category: post.category,
                 tag: post.tags,
             };
         });
