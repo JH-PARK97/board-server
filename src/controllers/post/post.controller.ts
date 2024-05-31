@@ -86,7 +86,7 @@ const createBlogPost = async (req: Request, res: Response) => {
 
         const categoryData = await getCategoryData(category, user.id);
         if (!categoryData) return null;
-        
+
         const createPost = await createNewPost(user.id, categoryData.id, title, content);
 
         res.status(200).json({ data: createPost, resultCd: 200 });
@@ -136,18 +136,43 @@ const createNewPost = async (userId: number, categoryId: number, title: string, 
 
 const updateBlogPost = async (req: Request, res: Response) => {
     try {
-        const { title, content } = req.body;
+        const { title, content, category } = req.body;
         const user = (req as any).user;
+        const { id } = req.params;
+        const postId = Number(id);
+
+        if (!user) {
+            return res.status(400).json({ error: '존재하지 않는 유저입니다.', resultCd: 400 });
+        }
+
+        const categoryData = await getCategoryData(category, user.id);
+
+        if (!categoryData) return res.status(400).json({ error: '존재하지 않는 카테고리입니다.', resultCd: 400 });
+
+        // 카테고리 수정되기 전 현재 카테고리
+        const previousCategory = await prisma.post.findUnique({
+            where: { id: postId },
+            select: { categoryId: true },
+        });
+
         const updatePost = await prisma.post.update({
-            where: { id: Number(req.params.id) },
+            where: { id: postId },
             data: {
                 title,
                 content,
                 user: {
                     connect: { id: user.id },
                 },
+                category: {
+                    connect: { id: categoryData.id },
+                },
             },
         });
+
+        // 현재 카테고리에 존재하는 post 개수에 따라 카테고리 삭제 여부 결정
+        if (previousCategory && previousCategory.categoryId) {
+            await checkAndDeleteEmptyCategory(previousCategory.categoryId);
+        }
         res.status(200).json({ data: updatePost, resultCd: 200 });
     } catch (e) {
         console.error(e);
@@ -237,7 +262,10 @@ const deleteBlogPostById = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const postId = Number(id);
-        const post = await prisma.post.findUnique({ where: { id: postId } });
+        const post = await prisma.post.findUnique({
+            where: { id: postId },
+            select: { categoryId: true, userId: true },
+        });
 
         if (!post) {
             res.status(200).json({ resultMsg: '이미 삭제된 게시글 입니다.', resultCd: 404 });
@@ -248,6 +276,9 @@ const deleteBlogPostById = async (req: Request, res: Response) => {
             const deletePost = await prisma.post.delete({
                 where: { id: postId },
             });
+            if (post && post.categoryId) {
+                await checkAndDeleteEmptyCategory(post.categoryId);
+            }
             res.status(200).json({ data: deletePost, resultCd: 200 });
         } else {
             res.status(200).json({ resultMsg: '본인이 작성한 게시글만 삭제할 수 있습니다.', resultCd: 403 });
@@ -255,6 +286,18 @@ const deleteBlogPostById = async (req: Request, res: Response) => {
     } catch (e) {
         console.log(e);
         res.status(500);
+    }
+};
+
+const checkAndDeleteEmptyCategory = async (categoryId: number) => {
+    const postCount = await prisma.post.count({
+        where: { categoryId },
+    });
+
+    if (postCount === 0) {
+        await prisma.category.delete({
+            where: { id: categoryId },
+        });
     }
 };
 
