@@ -35,4 +35,25 @@ const getCategories = async (req: Request, res: Response) => {
         console.log(e);
     }
 };
-export default { getCategories };
+
+const deleteCategories = async (req: Request, res: Response) => {
+    try {
+        const { categoryId } = req.params;
+        const user = (req as any).user;
+        const existingCategory = await prisma.category.findUnique({
+            where: { id: Number(categoryId) },
+        });
+        if (!existingCategory) {
+            return res.status(400).json({ resultMsg: '존재하지 않는 카테고리입니다.', resultCd: 400 });
+        }
+        const deleteCategory = await prisma.category.delete({
+            where: { id: Number(categoryId) },
+        });
+
+        res.status(200).json({ data: deleteCategory, resultCd: 200 });
+    } catch (e) {
+        console.error(e);
+        res.status(500).json(e);
+    }
+};
+export default { getCategories, deleteCategories };

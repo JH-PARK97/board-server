@@ -47,5 +47,6 @@ router.get('/user/:userId', userController.getUserPostById);
 
 // 카테고리(해당 유저 게시글의 카테고리)
 router.get('/category/:userId', categoryController.getCategories);
+router.delete('/category/:categoryId', authMiddleware, categoryController.deleteCategories);
 
 export default router;

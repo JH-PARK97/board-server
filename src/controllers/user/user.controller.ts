@@ -41,7 +41,11 @@ const getUserPostById = async (req: Request, res: Response) => {
                 profileImagePath: true,
                 _count: {
                     select: {
-                        posts: true,
+                        posts: {
+                            where: {
+                                ...(category ? { categoryId: Number(category) } : {}),
+                            },
+                        },
                     },
                 },
                 posts: {
